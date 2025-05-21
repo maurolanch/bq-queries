@@ -14,7 +14,7 @@ group by owner_user_id, year_post
 ) select *
 from ranked_t
 where ranked_year = 1
-order by year_post desc
+order by year_post desc;
 
 
 --¿Cuál es el promedio de score de las respuestas por usuario, pero solo para aquellos que tienen al menos 10 respuestas?
@@ -22,7 +22,7 @@ order by year_post desc
 select owner_user_id, avg(score) as avg_score, count(*) as count_answers
 from `bigquery-public-data.stackoverflow.posts_answers`
 group by owner_user_id
-having count(*) >= 10
+having count(*) >= 10;
 
 
 -- ¿Cuántas preguntas con la etiqueta python recibieron más de 5 respuestas en los últimos 2 años?
@@ -40,7 +40,7 @@ group by parent_id
 from q_filtered q
 join answers_counted a
 on q.id = a.question_id
-where total_answers >= 5
+where total_answers >= 5;
 
 
 --📦 Dataset: bigquery-public-data.thelook_ecommerce
@@ -60,7 +60,7 @@ where rank_price = 1
 from expesive_prod ep
 join `bigquery-public-data.thelook_ecommerce.products` prod
 on ep.product_id = prod.id
-order by ep.year_month desc
+order by ep.year_month desc;
 
 --¿Cuánto gastó en promedio cada cliente en su primera compra?
 
@@ -73,7 +73,7 @@ row_number() over (partition by user_id order by min_date) as min_order
 from user_orders
 ) select avg(ranked_min_order.total_order)
 from ranked_min_order
-where min_order = 1
+where min_order = 1;
 
 --Calcula el ingreso acumulado por mes
 
@@ -83,7 +83,7 @@ FROM `bigquery-public-data.thelook_ecommerce.order_items`
 group by year_month
 ) select year_month, sum(montly_sales) over (order by year_month)
 from year_month_sales
-order by year_month desc
+order by year_month desc;
 
 
 --¿Qué clientes están en el top 10% de gasto total?
@@ -97,4 +97,18 @@ ntile(10) over (order by sum_sales desc) ntile_column
 from user_sales
 ) select *
 from ntile_results
-where ntile_column = 1
+where ntile_column = 1;
+
+--🏷 Dataset: bigquery-public-data.thelook_ecommerce.orders
+
+--1: Clientes más frecuentes en los últimos 3 meses
+
+select user_id, count(*)
+from `bigquery-public-data.thelook_ecommerce.orders`
+where date(created_at) >= date_sub(current_date(), interval 3 month)
+group by user_id
+order by count(*) desc
+limit 10;
+
+--2: Pedidos repetidos por cliente
+
