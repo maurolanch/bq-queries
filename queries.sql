@@ -111,4 +111,37 @@ order by count(*) desc
 limit 10;
 
 --2: Pedidos repetidos por cliente
+--¿Cuántos clientes realizaron más de 1 pedido el mismo día?
 
+with clients_orders as (
+select user_id, date(created_at) as order_day, count(*) as count_orders
+from `bigquery-public-data.thelook_ecommerce.orders`
+group by user_id, order_day
+having count(*) > 1
+) select count(distinct user_id)
+from clients_orders
+
+--🏷 Dataset: bigquery-public-data.thelook_ecommerce.order_items
+---Ejercicio 3: Productos más vendidos por cantidad total de unidades
+--¿Cuáles son los 5 productos más vendidos en total?
+
+ select oi.product_id, p.name, count(*) as total_qty
+from `bigquery-public-data.thelook_ecommerce.order_items` oi 
+join `bigquery-public-data.thelook_ecommerce.products` p
+on oi.product_id = p.id
+where status <> 'returned'
+group by oi.product_id, p.name
+order by count(*) desc
+limit 5
+
+--🏷 Dataset: bigquery-public-data.thelook_ecommerce.users + orders
+--Ejercicio 4: Clientes nuevos por mes
+--¿Cuántos clientes nuevos se registraron cada mes?
+
+select format_date('%Y-%m',u.created_at) as user_date, count(*),
+count(distinct u.id) as user_count
+from `bigquery-public-data.thelook_ecommerce.users` u 
+join `bigquery-public-data.thelook_ecommerce.orders` o
+on u.id = o.user_id
+group by user_date
+order by user_date desc;
