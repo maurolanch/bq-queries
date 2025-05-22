@@ -138,10 +138,36 @@ limit 5
 --Ejercicio 4: Clientes nuevos por mes
 --¿Cuántos clientes nuevos se registraron cada mes?
 
-select format_date('%Y-%m',u.created_at) as user_date, count(*),
+select format_date('%Y-%m',u.created_at) as user_date,
 count(distinct u.id) as user_count
 from `bigquery-public-data.thelook_ecommerce.users` u 
 join `bigquery-public-data.thelook_ecommerce.orders` o
 on u.id = o.user_id
 group by user_date
 order by user_date desc;
+
+--🏷 Dataset: bigquery-public-data.thelook_ecommerce.orders
+-- Ejercicio 5: Tiempo promedio entre pedidos por cliente
+--¿Cuál es el tiempo promedio entre pedidos para los 10 clientes más activos?
+
+with top10 as (
+select user_id, count(*) as total_orders
+from `bigquery-public-data.thelook_ecommerce.orders`
+group by user_id
+order by count(*) desc
+limit 10
+),dates as (
+select t.user_id as user_id, date(o.created_at) as curr_date, 
+lag(date(o.created_at)) over (partition by t.user_id order by date(o.created_at)) as prev_date
+from `bigquery-public-data.thelook_ecommerce.orders` o 
+join top10 t on
+o.user_id = t.user_id
+), days as( 
+select user_id, date_diff(curr_date, prev_date, day) as date_dif
+from dates 
+where date_diff(curr_date, prev_date, day) is not null
+order by date_dif desc
+) select user_id, avg(date_dif) as avg_user
+from days
+group by user_id
+order by avg_user;
