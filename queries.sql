@@ -204,3 +204,12 @@ where accepted_answer_id is not null and
 owner_user_id is not null
 group by owner_user_id
 order by answered_q desc;
+
+--✅ Ejercicio 9: Pregunta sin resolver más antigua
+--¿Cuál es la pregunta más antigua que aún no tiene una respuesta aceptada?
+
+select id, creation_date
+from `bigquery-public-data.stackoverflow.posts_questions`
+where accepted_answer_id is null
+order by creation_date
+limit 1;
