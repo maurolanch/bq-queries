@@ -183,4 +183,14 @@ where accepted_answer_id is not null
 group by year, month
 order by year desc, month desc;
 
+--✅ Ejercicio 7: Lenguajes más mencionados en el último año
+--¿Cuáles son los 10 lenguajes más mencionados en las etiquetas (tags) de las preguntas del último año?
+
+select tags, count(*) as tag_mentions
+from `bigquery-public-data.stackoverflow.posts_questions`,
+unnest(split(tags, '|')) as tags
+where date(creation_date) >= date_sub(current_date(), interval 1 year)
+group by tags
+order by tag_mentions desc
+limit 10;
 
