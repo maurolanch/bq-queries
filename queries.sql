@@ -167,7 +167,20 @@ select user_id, date_diff(curr_date, prev_date, day) as date_dif
 from dates 
 where date_diff(curr_date, prev_date, day) is not null
 order by date_dif desc
-) select user_id, avg(date_dif) as avg_user
+) select user_id, avg(date_dif) as avg_days_diff
 from days
 group by user_id
-order by avg_user;
+order by avg_days_diff;
+
+--📘 Dataset: bigquery-public-data.stackoverflow.posts_questions
+--✅ Ejercicio 6: Preguntas resueltas por mes
+--¿Cuántas preguntas con respuesta aceptada (accepted_answer_id no nulo) se registraron por mes?
+
+select extract(year from creation_date) as year, extract(month from creation_date) as month, 
+count(*) as total_accepted_answers
+from `bigquery-public-data.stackoverflow.posts_questions`
+where accepted_answer_id is not null
+group by year, month
+order by year desc, month desc;
+
+
