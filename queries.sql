@@ -119,7 +119,7 @@ from `bigquery-public-data.thelook_ecommerce.orders`
 group by user_id, order_day
 having count(*) > 1
 ) select count(distinct user_id)
-from clients_orders
+from clients_orders;
 
 --🏷 Dataset: bigquery-public-data.thelook_ecommerce.order_items
 ---Ejercicio 3: Productos más vendidos por cantidad total de unidades
@@ -132,7 +132,7 @@ on oi.product_id = p.id
 where status <> 'returned'
 group by oi.product_id, p.name
 order by count(*) desc
-limit 5
+limit 5;
 
 --🏷 Dataset: bigquery-public-data.thelook_ecommerce.users + orders
 --Ejercicio 4: Clientes nuevos por mes
@@ -221,4 +221,21 @@ select avg(date_diff(a.creation_date, q.creation_date, day)) as days
 from `bigquery-public-data.stackoverflow.posts_questions` q 
 join `bigquery-public-data.stackoverflow.posts_answers` a 
 on q.accepted_answer_id = a.id
-where q.accepted_answer_id is not null
+where q.accepted_answer_id is not null;
+
+--✅ Ejercicio 11: Distribución de preguntas por día de la semana
+--¿Cuál es el día de la semana con más preguntas publicadas? ¿Y con menos?
+
+with dayofweek_t as (
+select extract(dayofweek from creation_date) as day_week, count(*) as total_q
+from `bigquery-public-data.stackoverflow.posts_questions`
+group by day_week
+), ranked_t as 
+( select *,
+rank() over (order by total_q) as min_rank,
+rank() over (order by total_q desc) as max_rank
+from dayofweek_t
+) select day_week, total_q
+from ranked_t
+where min_rank = 1
+or max_rank = 1
