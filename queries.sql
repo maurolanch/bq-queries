@@ -213,3 +213,12 @@ from `bigquery-public-data.stackoverflow.posts_questions`
 where accepted_answer_id is null
 order by creation_date
 limit 1;
+
+--✅ Ejercicio 10: Duración promedio hasta la aceptación
+--¿Cuánto tiempo promedio tarda en aceptarse una respuesta desde que se publica la pregunta?
+
+select avg(date_diff(a.creation_date, q.creation_date, day)) as days
+from `bigquery-public-data.stackoverflow.posts_questions` q 
+join `bigquery-public-data.stackoverflow.posts_answers` a 
+on q.accepted_answer_id = a.id
+where q.accepted_answer_id is not null
