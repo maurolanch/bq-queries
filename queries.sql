@@ -194,3 +194,13 @@ group by tags
 order by tag_mentions desc
 limit 10;
 
+
+--✅ Ejercicio 8: Usuarios con más preguntas resueltas
+--¿Qué usuarios (owner_user_id) tienen la mayor cantidad de preguntas con respuesta aceptada?
+
+select owner_user_id, count(*) as answered_q
+from `bigquery-public-data.stackoverflow.posts_questions`
+where accepted_answer_id is not null and 
+owner_user_id is not null
+group by owner_user_id
+order by answered_q desc;
