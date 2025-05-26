@@ -269,3 +269,17 @@ group by tag
 order by count(*) desc
 limit 10;
 
+
+--✅ Ejercicio 14: Preguntas sin respuestas en los últimos 3 meses
+--¿Cuántas preguntas no han sido respondidas ni tienen respuesta aceptada en los últimos 3 meses?
+
+with unanswered_q as (
+select q.id as id, q.creation_date as c_date
+from `bigquery-public-data.stackoverflow.posts_questions` q
+left join `bigquery-public-data.stackoverflow.posts_answers` a
+on q.id = a.parent_id
+where a.parent_id is null and
+q.accepted_answer_id is null
+)select count(*) as tot_unanswered_q_last_3_months
+from unanswered_q
+where date(c_date) > date_sub(current_date(), INTERVAL 3 month)
