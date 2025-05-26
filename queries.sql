@@ -253,4 +253,19 @@ group by id, title
 select *
 from unnest_tags
 order by total_tags desc
-limit 5
+limit 5;
+
+--✅ Ejercicio 13: Etiquetas más frecuentes de preguntas resueltas
+--¿Cuáles son las 10 etiquetas más frecuentes entre las preguntas que tienen respuesta aceptada?
+
+with tags_t as (
+select id, tag
+from `bigquery-public-data.stackoverflow.posts_questions`,
+unnest(split(tags, '|')) as tag
+where accepted_answer_id is not null
+) select tag, count(*)
+from tags_t
+group by tag
+order by count(*) desc
+limit 10;
+
