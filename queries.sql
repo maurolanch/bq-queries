@@ -239,3 +239,18 @@ from dayofweek_t
 from ranked_t
 where min_rank = 1
 or max_rank = 1
+
+--✅ Ejercicio 12: Preguntas con más etiquetas
+--¿Cuáles son las 5 preguntas con mayor cantidad de etiquetas (tags)?
+
+with unnest_tags as (
+SELECT id, title,
+count(*) as total_tags
+FROM `bigquery-public-data.stackoverflow.posts_questions`, 
+UNNEST(SPLIT(tags, '|')) AS tag
+group by id, title
+)
+select *
+from unnest_tags
+order by total_tags desc
+limit 5
